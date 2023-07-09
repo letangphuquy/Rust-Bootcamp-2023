@@ -3,8 +3,8 @@
 fn exercise1() {
     // Use as many approaches as you can to make it work
     let x = String::from("hello, world");
-    let y = x;
-    let z = x;
+    let y = &x;
+    let z = x; // or let z = y
 }
 
 // Exercise 2
@@ -42,8 +42,8 @@ fn exercise3() {
         let mut addition: f64 = 0.0;
 
         // Sumar valores en additions
-        for element_index in additions {
-            let addition_aux = values[element_index];
+        for element_index in additions.iter() {
+            let addition_aux = values[*element_index];
             addition = addition_aux + addition;
         }
     }
@@ -51,10 +51,19 @@ fn exercise3() {
 
 // Exercise 4
 // Make it compile
+
+/*
+unsafe
 fn exercise4(value: u32) -> &'static str {
-    let str_value = value.to_string(); // Convert u32 to String
-    let str_ref: &str = &str_value; // Obtain a reference to the String
-    str_ref // Return the reference to the String
+    static mut str_value: String = String::new();
+    str_value.push_str(&value.to_string()); // Convert u32 to String
+    // let str_ref: &str = &str_value; // Obtain a reference to the String
+    &str_value // Return the reference to the String
+}
+ */
+
+fn exercise4(value: u32) -> String {
+    value.to_string()
 }
 
 // Exercise 5
@@ -70,7 +79,7 @@ fn exercise5() {
         None => {
             let value = "3.0".to_string();
             my_map.insert(key, value);
-            &value // HERE IT FAILS
+            my_map.get(&key).unwrap() // HERE IT not FAILS
         }
     };
 
@@ -84,13 +93,16 @@ use std::io;
 
 fn exercise6() {
     let mut prev_key: &str = "";
-
+    let mut data: Vec<String>;
+    let mut temp: Vec<String>;
+    
     for line in io::stdin().lines() {
         let s = line.unwrap();
-
-        let data: Vec<&str> = s.split("\t").collect();
+        
+        data = s.split("\t").into_iter().map(|q| q.to_string()).collect();
         if prev_key.len() == 0 {
-            prev_key = data[0];
+            temp = data.clone();
+            prev_key = temp[0].as_str();
         }
     }
 }
@@ -99,27 +111,37 @@ fn exercise6() {
 // Make it compile
 fn exercise7() {
     let mut v: Vec<&str> = Vec::new();
-    {
+    // {
         let chars = [b'x', b'y', b'z'];
         let s: &str = std::str::from_utf8(&chars).unwrap();
         v.push(&s);
-    }
+    // }
     println!("{:?}", v);
 }
 
 // Exercise 8
 // Make it compile
+
+//best solution I can think of now, too hard
+fn borrow(s: String, result: &mut Vec<&str>) -> String {
+    result = s.trim()[..].split_whitespace().collect();
+    s
+}
+
 fn exercise8() {
     let mut accounting = vec!["Alice", "Ben"];
+    let mut temp: String;
+    let mut add_input: String; 
     
     loop {
-        let mut add_input = String::from("");
-
+        add_input = String::new();
         io::stdin()
             .read_line(&mut add_input)
             .expect("Failed to read line");
 
-        let add_vec: Vec<&str> = add_input.trim()[..].split_whitespace().collect();
+        let mut add_vec: Vec<&str>;
+        temp = add_input.clone();
+        temp = borrow(temp, &mut add_vec);
 
         if add_vec.len() < 1 {
             println!("Incorrect input, try again");
