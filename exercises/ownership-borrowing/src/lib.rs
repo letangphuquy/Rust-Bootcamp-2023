@@ -122,33 +122,26 @@ fn exercise7() {
 // Exercise 8
 // Make it compile
 
-//best solution I can think of now, too hard
-fn borrow(s: String, result: &mut Vec<&str>) -> String {
-    result = s.trim()[..].split_whitespace().collect();
-    s
-}
-
 fn exercise8() {
-    let mut accounting = vec!["Alice", "Ben"];
-    let mut temp: String;
+    let mut accounting: Vec<String> = vec!["Alice".to_string(), "Ben".to_string()];
+    let mut s: String;
     let mut add_input: String; 
     
+    let mut add_vec: Vec<String>;
     loop {
         add_input = String::new();
         io::stdin()
-            .read_line(&mut add_input)
-            .expect("Failed to read line");
-
-        let mut add_vec: Vec<&str>;
-        temp = add_input.clone();
-        temp = borrow(temp, &mut add_vec);
+        .read_line(&mut add_input)
+        .expect("Failed to read line");
+    
+        s = add_input.clone();
+        add_vec = s.trim()[..].split_whitespace().map(|x: &str| x.to_string()).collect();
 
         if add_vec.len() < 1 {
             println!("Incorrect input, try again");
             continue;
         }
 
-        let person = add_vec[0];
-        accounting.push(person);
+        accounting.push(add_vec[0].clone());
     }
 }
