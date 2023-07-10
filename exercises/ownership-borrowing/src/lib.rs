@@ -18,7 +18,7 @@ fn exercise2() {
 }
 // Only modify the code below!
 fn take_ownership(s: String) -> String {
-    //println!("{}", s);
+    println!("{}", s);
     s
 }
 
@@ -107,6 +107,17 @@ fn exercise6() {
     }
 }
 
+fn exercise6_sol() {
+    let mut prev_key = String::new();
+    for line in io::stdin().lines() {
+        let s = line.unwrap();
+        let data: Vec<&str> = s.split("\t").collect();
+        if prev_key.len() == 0 {
+            prev_key = data[0].to_owned();
+        }
+    }
+}
+
 // Exercise 7
 // Make it compile
 fn exercise7() {
@@ -124,18 +135,14 @@ fn exercise7() {
 
 fn exercise8() {
     let mut accounting: Vec<String> = vec!["Alice".to_string(), "Ben".to_string()];
-    let mut s: String;
-    let mut add_input: String; 
-    
-    let mut add_vec: Vec<String>;
     loop {
-        add_input = String::new();
+        let mut add_input = String::new();
         io::stdin()
         .read_line(&mut add_input)
         .expect("Failed to read line");
     
-        s = add_input.clone();
-        add_vec = s.trim()[..].split_whitespace().map(|x: &str| x.to_string()).collect();
+        let s = add_input.clone();
+        let add_vec: Vec<String> = s.trim()[..].split_whitespace().map(|x: &str| x.to_string()).collect();
 
         if add_vec.len() < 1 {
             println!("Incorrect input, try again");
