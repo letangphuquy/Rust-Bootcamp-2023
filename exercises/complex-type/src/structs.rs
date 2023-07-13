@@ -1,7 +1,11 @@
+use std::clone;
+
 // Exercise 1
 // Fix the error
 // Make it compile
 // Run test
+#[derive(PartialEq)]
+#[derive(Debug)]
 struct Person {
     name: String,
     age: u8,
@@ -36,15 +40,15 @@ impl Agent {
     fn new(name: String, age: u32) -> Agent {
         Agent { name, age }
     }
-
+    
     // Get the name of the person
     fn get_name(&self) -> &str {
-        todo!()
+        &self.name[..]
     }
 
     // Get the age of the person
     fn get_age(&self) -> u32 {
-        todo!()
+        self.age
     }
 }
 
@@ -60,19 +64,19 @@ impl Calculator {
     fn new() -> Self {
         Calculator { value: 0 }
     }
-
-    fn add(&self, num: i32) {
+    
+    fn add(&mut self, num: i32) {
         self.value += num;
     }
 
-    fn subtract(mut self, num: i32) {
+    fn subtract(&mut self, num: i32) {
         self.value -= num;
     }
-    fn clear(self) {
+    fn clear(&mut self) {
         self.value = 0;
     }
-
-    fn get_value(self) -> i32 {
+    
+    fn get_value(&self) -> i32 {
         self.value
     }
 }
@@ -86,6 +90,16 @@ struct User {
     age: u32,
 }
 
+impl User {
+    fn clone(&self) -> Self {
+        User {
+            first: self.first.to_owned(),
+            last: self.last.to_owned(),
+            age: self.age
+        }
+    }
+}
+
 fn exercise4() {
     let u1 = User {
         first: String::from("John"),
@@ -93,14 +107,14 @@ fn exercise4() {
         age: 22,
     };
 
-    let u2 = User {
-        first: String::from("Mary"),
-        ..u1
-        
-    };
+    // let u2 = User {
+    //     first: String::from("Mary"),
+    //     ..u1 
+    // };
+    let u2 = u1.clone(); //I'll write it like this instead
 
-    println!("user: {:#?}", u1);
-
+    println!("user: {:#?}", u1.clone());
+    
 }
 
 // Exercise 5
@@ -120,12 +134,12 @@ fn exercise5() {
         str_val: "twenty".to_string(),
         int_val: 20,
     });
-
     
-    let moved = foos[0];
-
     
-    let moved_field = foos[0].str_val;
+    let moved = &foos[0];
+    
+    
+    let moved_field = (&foos[0]).str_val.to_owned();
 }
 
 // Exercise 6
@@ -152,25 +166,27 @@ impl Package {
             }
         }
     }
-
-    fn is_international(&self) -> ??? {
-        // Something goes here...
+    
+    fn is_international(&self) -> bool {
+        self.sender_country != self.recipient_country
     }
 
-    fn get_fees(&self, cents_per_gram: i32) -> ??? {
-        // Something goes here...
+    fn get_fees(&self, cents_per_gram: i32) -> i32 {
+        self.weight_in_grams * cents_per_gram
     }
 }
+/*
+*/
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    
     // Test for exercise 1
     #[test]
     fn exercise1_should_work() {
         let p = exercise1();
-
+        
         let p_expectation = Person {
             name: String::from("sunface"),
             age: 30,
@@ -179,46 +195,45 @@ mod tests {
         assert_eq!(p, p_expectation);
         
     }
-
     // Test for exercise 2
     #[test]
     fn exercise2_should_work() {
         // Create a new Person instance
         let agent = Agent::new(String::from("John"), 30);
-
+        
         // Test the get_name method
         assert_eq!(agent.get_name(), "John");
-
+        
         // Test the get_age method
         assert_eq!(agent.get_age(), 30);
     }
-
+    
     // Test for exercise 3
     #[test]
     fn exercise3_should_work() {
         let mut calculator = Calculator::new();
         calculator.add(5);
         assert_eq!(calculator.get_value(), 5);
-
+        
         calculator.subtract(2);
         assert_eq!(calculator.get_value(), 3);
-
+        
         calculator.clear();
         assert_eq!(calculator.get_value(), 0);
-
+        
     }
-
-
+    
+    
     // Test for exercise 6
     #[test]
     #[should_panic]
     fn fail_creating_weightless_package() {
         let sender_country = String::from("Spain");
         let recipient_country = String::from("Austria");
-
+        
         Package::new(sender_country, recipient_country, -2210);
     }
-
+    
     // Test for exercise 6
     #[test]
     fn create_international_package() {
@@ -229,15 +244,15 @@ mod tests {
 
         assert!(package.is_international());
     }
-
+    
     // Test for exercise 6
     #[test]
     fn create_local_package() {
         let sender_country = String::from("Canada");
         let recipient_country = sender_country.clone();
-
+        
         let package = Package::new(sender_country, recipient_country, 1200);
-
+        
         assert!(!package.is_international());
     }
     // Test for exercise 6
@@ -245,13 +260,14 @@ mod tests {
     fn calculate_transport_fees() {
         let sender_country = String::from("Spain");
         let recipient_country = String::from("Spain");
-
+        
         let cents_per_gram = 3;
-
+        
         let package = Package::new(sender_country, recipient_country, 1500);
-
+        
         assert_eq!(package.get_fees(cents_per_gram), 4500);
         assert_eq!(package.get_fees(cents_per_gram * 2), 9000);
     }
-
+    /*
+    */
 }
